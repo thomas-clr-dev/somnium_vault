@@ -44,7 +44,7 @@ jobs:
 
       # Optionnel : Committer les fichiers de log dans le dépôt (attention aux boucles de push)
       - name: Commit log files
-        if: success() && github.event_name == 'push'
+        # if: success() && github.event_name == 'push'
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
