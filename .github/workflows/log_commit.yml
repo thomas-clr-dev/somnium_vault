@@ -1,7 +1,10 @@
+name: Log Commit Messages
+
 on:
-    push:
-      branches:
-        - dev
+  push:
+    branches:
+      - main
+
 jobs:
   log_commits:
     runs-on: ubuntu-latest
@@ -14,38 +17,34 @@ jobs:
       - name: Parse commit messages and organize logs
         shell: bash
         run: |
-            # Créer le dossier principal si non existant
-            mkdir -p log_commit
-  
-            # Extraire les messages de commit depuis le fichier d'événement
-            commit_messages=$(jq -r '.commits[].message' "$GITHUB_EVENT_PATH")
-            echo "Found commit messages:"
-            echo "$commit_messages"
-  
-            # Pour chaque message de commit
-            for msg in $commit_messages; do
-                # Extraire le premier mot du message
-                first_word=$(echo "$msg" | awk '{print $1}')
-                echo "Processing commit with first word: $first_word"
-  
-                # Créer le sous-dossier correspondant dans log_commit
-                mkdir -p "log_commit/$first_word"
+          # Créer le dossier principal si non existant
+          mkdir -p log_commit
 
-                #Extraire le deuxième mot du message
-                second_word=$(echo "$msg" | awk '{print $2}')
-                echo "Processing commit with second word: $second_word"
+          # Extraire les messages de commit depuis le fichier d'événement
+          commit_messages=$(jq -r '.commits[].message' "$GITHUB_EVENT_PATH")
+          echo "Found commit messages:"
+          echo "$commit_messages"
 
-                # Créer le sous-dossier correspondant dans log_commit
-                mkdir -p "log_commit/$first_word/$second_word"
-  
-                # Ajouter le message dans un fichier commit_log.txt dans le sous-dossier
-                echo "$msg" >> "log_commit/$first_word/$second_word/commit_log.txt"
-            done
-  
-            # Afficher la structure du dossier log_commit pour vérification
-            echo "Dossier log_commit créé avec la structure suivante :"
-            find log_commit
+          # Pour chaque message de commit
+          for msg in $commit_messages; do
+              # Extraire le premier mot du message
+              first_word=$(echo "$msg" | awk '{print $1}')
+              echo "Processing commit with first word: $first_word"
+
+              # Créer le sous-dossier correspondant dans log_commit
+              mkdir -p "log_commit/$first_word"
+
+              # Ajouter le message dans un fichier commit_log.txt dans le sous-dossier
+              echo "$msg" >> "log_commit/$first_word/commit_log.txt"
+          done
+
+          # Afficher la structure du dossier log_commit pour vérification
+          echo "Dossier log_commit créé avec la structure suivante :"
+          find log_commit
+
+      # Optionnel : Committer les fichiers de log dans le dépôt (attention aux boucles de push)
       - name: Commit log files
+        if: success() && github.event_name == 'push'
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
