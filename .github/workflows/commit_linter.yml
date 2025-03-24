@@ -1,0 +1,49 @@
+# name: Commit Message Lint
+
+# on:
+#   push:
+#     branches:
+#       - main
+#       - dev
+#       # Ajoutez d'autres branches si nécessaire
+
+# jobs:
+#   commit_lint:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v3
+#         with:
+#           fetch-depth: 0
+
+#       - name: Lint commit messages
+#         shell: bash
+#         run: |
+#           # Extraire la liste des messages de commit depuis l'événement GitHub
+#           commit_messages=$(jq -r '.commits[].message' "$GITHUB_EVENT_PATH")
+
+#           echo "=== Vérification des messages de commit ==="
+
+#           # Parcourir chaque message de commit
+#           echo "$commit_messages" | while IFS= read -r msg; do
+#             # Sauter si la ligne est vide (ce qui peut arriver si pas de commit)
+#             if [ -z "$msg" ]; then
+#               continue
+#             fi
+
+#             echo "Commit détecté : '$msg'"
+
+#             # Vérification par REGEX :
+#             if [[ ! "$msg" =~ ^(General|Front|Back)\ (Add|Update|Fix|Config|Feat|Doc|Test)\s+:\s+.* ]]; then
+#               echo "❌ Erreur : le message ne respecte pas la convention."
+#               echo "   Format attendu :"
+#               echo "   <General|Front|Back> <Add|Update|Fix|Config|Feat|Doc|Test> : <Description>"
+#               echo "   Exemple : Front Add : Ajout d'un nouveau composant"
+#               exit 1
+#             else
+#               echo "✅ Le message respecte la convention."
+#             fi
+#           done
+
+#           echo "=== Tous les commits respectent la convention ==="
