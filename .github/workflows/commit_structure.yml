@@ -39,7 +39,7 @@ jobs:
             # 1. Le premier mot = General, Front ou Back
             # 2. Un espace
             # 3. Le deuxième mot = Add, Update, Fix, Config, Feat, Doc, Test
-            # 4. Deux-points :
+            # 4. Un espace et deux points :
             # 5. Au moins un espace et un caractère après le :
             if [[ ! "$msg" =~ ^(General|Front|Back)\ (Add|Update|Fix|Config|Feat|Doc|Test):\ .* ]]; then
               echo "❌ Erreur : le message ne respecte pas la convention."
