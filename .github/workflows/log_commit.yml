@@ -55,3 +55,15 @@ jobs:
           # Afficher la structure du dossier log_commit pour vérification
           echo "Structure du dossier log_commit :"
           find log_commit
+
+      # Optionnel : Commiter automatiquement les fichiers log dans le dépôt
+      - name: Commit log files
+        if: success() && github.event_name == 'push'
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add log_commit/*
+          git commit -m "Update log_commit files from push ${{ github.sha }}"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
