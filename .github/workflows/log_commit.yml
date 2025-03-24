@@ -1,0 +1,55 @@
+on:
+    push:
+      branches:
+        - dev
+jobs:
+  log_commits:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository with full history
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Parse commit messages and organize logs
+        shell: bash
+        run: |
+            # Créer le dossier principal si non existant
+            mkdir -p log_commit
+  
+            # Extraire les messages de commit depuis le fichier d'événement
+            commit_messages=$(jq -r '.commits[].message' "$GITHUB_EVENT_PATH")
+            echo "Found commit messages:"
+            echo "$commit_messages"
+  
+            # Pour chaque message de commit
+            for msg in $commit_messages; do
+                # Extraire le premier mot du message
+                first_word=$(echo "$msg" | awk '{print $1}')
+                echo "Processing commit with first word: $first_word"
+  
+                # Créer le sous-dossier correspondant dans log_commit
+                mkdir -p "log_commit/$first_word"
+
+                #Extraire le deuxième mot du message
+                second_word=$(echo "$msg" | awk '{print $2}')
+                echo "Processing commit with second word: $second_word"
+
+                # Créer le sous-dossier correspondant dans log_commit
+                mkdir -p "log_commit/$first_word/$second_word"
+  
+                # Ajouter le message dans un fichier commit_log.txt dans le sous-dossier
+                echo "$msg" >> "log_commit/$first_word/$second_word/commit_log.txt"
+            done
+  
+            # Afficher la structure du dossier log_commit pour vérification
+            echo "Dossier log_commit créé avec la structure suivante :"
+            find log_commit
+      - name: Commit log files
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add log_commit/*
+          git commit -m "Update log_commit files from push ${{ github.sha }}"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
