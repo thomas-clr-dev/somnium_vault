@@ -41,7 +41,7 @@ jobs:
             # 3. Le deuxième mot = Add, Update, Fix, Config, Feat, Doc, Test
             # 4. Un espace et deux points :
             # 5. Au moins un espace et un caractère après le :
-            if [[ ! "$msg" =~ ^(General|Front|Back)\ (Add|Update|Fix|Config|Feat|Doc|Test):\ .* ]]; then
+            if [[ ! "$msg" =~ ^(General|Front|Back)\ (Add|Update|Fix|Config|Feat|Doc|Test)\s*:\s+.* ]]; then
               echo "❌ Erreur : le message ne respecte pas la convention."
               echo "   Format attendu :"
               echo "   <General|Front|Back> <Add|Update|Fix|Config|Feat|Doc|Test>: <Description>"
