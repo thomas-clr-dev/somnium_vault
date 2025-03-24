@@ -1,0 +1,53 @@
+name: Laravel Pint Auto Fix
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  pint_auto_fix:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+
+      - name: Install dependencies
+        run: |
+          cd somniumvault-back
+          composer install --no-progress --prefer-dist
+
+      - name: Run Pint (auto-fix)
+        run: |
+          cd somniumvault-back
+          # Lancer Pint sans --test => corrections automatiques
+          ./vendor/bin/pint
+
+      - name: Commit and push changes
+        # Conditionnel : on ne pousse que si Pint a fait des modifs
+        # (et si ce n'est pas un commit provenant déjà d'un bot)
+        if: success() && github.event_name == 'push'
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+          # Vérifier s'il y a des modifications
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git add .
+            git commit -m "Apply Pint auto-fixes [skip ci]"
+            git push
+          else
+            echo "Aucune modification à pousser."
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
