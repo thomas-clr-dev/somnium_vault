@@ -3,7 +3,7 @@ name: Log Commit Messages
 on:
   push:
     branches:
-      - main
+      - dev
 
 jobs:
   log_commits:
@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          # persist-credentials: true
+          persist-credentials: true
       - name: Parse commit messages and organize logs
         shell: bash
         run: |
@@ -43,13 +43,13 @@ jobs:
           find log_commit
 
       # Optionnel : Committer les fichiers de log dans le dépôt (attention aux boucles de push)
-      - name: Commit log files
-        # if: success() && github.event_name == 'push'
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add log_commit/*
-          git commit -m "Update log_commit files from push ${{ github.sha }}"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Commit log files
+      #   if: success() && github.event_name == 'push'
+      #   run: |
+      #     git config --global user.name "GitHub Actions"
+      #     git config --global user.email "actions@github.com"
+      #     git add log_commit/*
+      #     git commit -m "Update log_commit files from push ${{ github.sha }}"
+      #     git push
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
